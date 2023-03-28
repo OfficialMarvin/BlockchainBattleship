@@ -26,8 +26,8 @@ console.log(grid);
 
 // Send the grid to the smart contract
 const sendGridToContract = async () => {
-  const contractAbi = [ /* your contract ABI here */ ];
-  const contractAddress = '0x123456789...'; // your contract address here
+  const contractAbi = [ /* ABI here */ ];
+  const contractAddress = '0x123456'; //contract address
 
   const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
