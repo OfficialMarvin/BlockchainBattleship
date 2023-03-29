@@ -59,11 +59,110 @@ if (s == 1) { // if 1 then make a sea square with boat polygon on top
 }
 drawGrid();
 console.log(grid);
+const contractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "x",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "y",
+				"type": "uint8"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8[][]",
+				"name": "board",
+				"type": "uint8[][]"
+			}
+		],
+		"name": "setGameBoard",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player1",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "isTurn",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "playerAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player2",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "isTurn",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "playerAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+const web3 = new Web3(window.ethereum);
+const ethereumButton = document.querySelector('.enableEthereumButton');
+
+ethereumButton.addEventListener('click', () => {
+    const ethereumButton = document.querySelector('.enableEthereumButton');
+    ethereumButton.addEventListener('click', () => {
+      //Check if we have Web3 provider
+      if (typeof window.ethereum !== 'undefined') {
+          // Request account access
+          window.ethereum.request({ method: 'eth_requestAccounts' })
+            .then((accounts) => {
+              console.log(accounts);
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+       } else {
+           console.log("Web3 provider not found");
+       }
+    });
+});
+const playerAddress = window.ethereum.selectedAddress;
+const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //Replace with your own Contract Address
+const myContract = new web3.eth.Contract(contractABI, contractAddress);
+myContract.methods.makeMove(2, 2).send({from: playerAddress})
+.then((result) => {
+console.log(result);
+})
+.catch((error) =>{
+console.error(error);
+});
 
 // Send the grid to the smart contract
 const sendGridToContract = async () => {
-  const contractAbi = [ /* ABI here */ ];
-  const contractAddress = '0x123456'; //contract address
+  const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //contract address
 
   const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
