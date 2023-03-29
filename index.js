@@ -70,4 +70,4 @@ const sendGridToContract = async () => {
   // Convert the grid to a string and send it to the contract
   const gridString = grid.toString();
   const tx = await contract.methods.setGameBoard(gridString).send({ from: playerAddress, gas: 100000 });
-};
+}
