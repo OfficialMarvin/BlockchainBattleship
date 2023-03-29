@@ -5,6 +5,7 @@ for (let i = 0; i < gridSize; i++) {
   grid[i] = new Array(gridSize).fill(0);
 }
 
+
 // Allow the user to place 1x1 ships on the grid
 const placeShip = (x, y) => {
   if (grid[x][y] === 0) {
@@ -21,7 +22,27 @@ for (let i = 1; i < 4; i++) {
     let y = prompt('Enter the y coordinate for your ship number ' + i);
     placeShip(x, y);
 }
+const cellSize = 50;
+const svg = document.getElementById('gridcontainter');
 
+
+function drawGrid() {   
+    for (let y = 0; y < grid.length; y++) {   
+        for (let x = 0; x < grid[y].length; x++) {   
+            if (grid[y][x] === 1) {   
+                drawShip(x * cellSize, y * cellSize);}}}}
+
+
+function drawShip(x, y) {
+  const ship = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  ship.setAttribute('x', x);
+  ship.setAttribute('y', y);
+  ship.setAttribute('width', cellSize);
+  ship.setAttribute('height', cellSize);
+  ship.setAttribute('fill', '#848482');
+  svg.appendChild(ship);
+}
+drawGrid();
 console.log(grid);
 
 // Send the grid to the smart contract
