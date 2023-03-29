@@ -59,7 +59,7 @@ if (s == 1) { // if 1 then make a sea square with boat polygon on top
 }
 drawGrid();
 console.log(grid);
-const contractABI = [
+const ABI = [
 	{
 		"inputs": [
 			{
@@ -128,43 +128,45 @@ const contractABI = [
 		"type": "function"
 	}
 ]
-const web3 = new Web3(window.ethereum);
+const web3 = new Web3("http://10.5.105.50:8545"); // Use the right URL for your local network
 const ethereumButton = document.querySelector('.enableEthereumButton');
-
 ethereumButton.addEventListener('click', () => {
-    const ethereumButton = document.querySelector('.enableEthereumButton');
-    ethereumButton.addEventListener('click', () => {
-      //Check if we have Web3 provider
-      if (typeof window.ethereum !== 'undefined') {
-          // Request account access
-          window.ethereum.request({ method: 'eth_requestAccounts' })
-            .then((accounts) => {
-              console.log(accounts);
-            })
-            .catch((error) => {
-              console.error(error);
-            });
-       } else {
-           console.log("Web3 provider not found");
-       }
-    });
+    //Check if we have Web3 provider
+    if (typeof window.ethereum != 'undefined') {
+        // Request account access
+        window.ethereum.request({ method: 'eth_requestAccounts' })
+        .then((accounts) => {
+            console.log(accounts);
+            makeMove();
+        })
+        .catch((error) => {
+            console.error(error);
+      });
+   } else {
+       console.log("Web3 provider not found");
+   }
 });
-const playerAddress = window.ethereum.selectedAddress;
-const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //Replace with your own Contract Address
-const myContract = new web3.eth.Contract(contractABI, contractAddress);
-myContract.methods.makeMove(2, 2).send({from: playerAddress})
-.then((result) => {
-console.log(result);
-})
-.catch((error) =>{
-console.error(error);
-});
+const x = 2;
+const y = 2;
+async function makeMove(x,y) {
+    const playerAddress = await window.ethereum.selectedAddress;
+    const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //Replace with your own Contract Address
+    const myContractInstance = new web3.eth.Contract(ABI, contractAddress);
+
+    myContractInstance.methods.makeMove(x, y).send({from: playerAddress})
+     .then((result) => {
+         console.log(result);
+     })
+     .catch((error) =>{
+         console.error(error);
+     });
+}
 
 // Send the grid to the smart contract
 const sendGridToContract = async () => {
   const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //contract address
 
-  const contract = new web3.eth.Contract(contractAbi, contractAddress);
+  const contract = new web3.eth.Contract(ABI, contractAddress);
 
   // Convert the grid to a string and send it to the contract
   const gridString = grid.toString();
