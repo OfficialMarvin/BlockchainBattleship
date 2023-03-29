@@ -11,6 +11,36 @@ contract Battleship {
     GameState public player1;
     GameState public player2;
 
+    function setGameBoard(uint8[][] memory board) public {
+    //Check if the board is valid, i.e., if it has dimensions of 5x5
+        require(board.length == 5 && board[0].length == 5, "Board dimensions not valid");
+
+    //Check which player's turn it is and set their game state accordingly with the provided board
+        if (player1.isTurn) {
+            require(player1.board.length == 0, "Player1's game board already set");
+            player1.board = board;
+            player2.isTurn = true;
+        } else {
+            require(player2.board.length == 0, "Player2's game board already set");
+            player2.board = board;
+            player1.isTurn = true;
+        }
+    
+    //Set the address of the caller as the current player's address
+    if(msg.sender==address(0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB)){
+      //set to an example Ethereum address for testing purposes only.
+      //replace this with your own ethereum public key in string format like: '0x123456789012345678901234567890'
+        
+      	if (player1.playerAddress == address(0)) {
+	         	player1.playerAddress= msg.sender;         
+      		}
+  	     	else{
+          		player2.playerAddress=msg.sender;           
+        	}      
+    } 
+    
+}
+
     // Function for a player to make a move
     function makeMove(uint8 x, uint8 y) public {
         // Check that it is the player's turn
