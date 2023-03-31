@@ -1,0 +1,69 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "x",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "y",
+				"type": "uint8"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8[][]",
+				"name": "board",
+				"type": "uint8[][]"
+			}
+		],
+		"name": "setGameBoard",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player1",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "isTurn",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "playerAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player2",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "isTurn",
+				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "playerAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
