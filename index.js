@@ -59,15 +59,43 @@ if (s == 1) { // if 1 then make a sea square with boat polygon on top
 }
 drawGrid();
 console.log(grid);
+console.log(window.ethereum);
+const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
+let web3;
 
-// Send the grid to the smart contract
-const sendGridToContract = async () => {
-  const contractAbi = [ /* ABI here */ ];
-  const contractAddress = '0x123456'; //contract address
+async function fetchABI(web3) {
+  const response = await fetch('https://raw.githubusercontent.com/OfficialMarvin/BlockchainBattleship/main/abi.json');
+  const data = await response.json();
+  const myContract = new web3.eth.Contract(data, contractAddress);
+  console.log(myContract);
+}
 
-  const contract = new web3.eth.Contract(contractAbi, contractAddress);
+const contractAddress = '0x3e4a3e6c3b446fD7a59c3dAdc2ba0db9a80Fec62';
 
-  // Convert the grid to a string and send it to the contract
-  const gridString = grid.toString();
-  const tx = await contract.methods.setGameBoard(gridString).send({ from: playerAddress, gas: 100000 });
+async function sendGrid(web3) {
+  await fetchABI(web3);
+}
+
+async function connectEth(){
+  if (typeof window.ethereum !== 'undefined') {
+    try {
+      await window.ethereum.enable();
+      web3 = new Web3(window.ethereum);
+      console.log('Connected to Ethereum successfully!');
+      const userAddress = await web3.eth.getCoinbase();
+      console.log(userAddress);
+      await sendGrid(web3);
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    console.log('Please install MetaMask to connect to the Ethereum network');
+  }
+}
+
+connectEth();
+
+
+async function makeMove(playerIndex, x, y) {
+  await myContract.methods.makeMove(x, y).send({ from: playerIndex });
 }
