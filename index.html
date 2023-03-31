@@ -8,8 +8,35 @@
 </head>
 <body>
 	<svg id="gridcontainter" width="500" height="500" style="border: 1px solid black"></svg> 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <button class="enableEthereumButton">Connect to Start</button>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.2.2/dist/web3.min.js"></script>
+        <script>
+            window.addEventListener('load', function () {
+                if (window.ethereum) {
+                    window.web3 = new Web3(ethereum);
+                    ethereum.enable()
+                        .then(() => {
+                            console.log("Ethereum enabled");
+    
+                            web3.eth.getAccounts(function (err, acc) {
+                                if (err != null) {
+                                    self.setStatus("There was an error fetching your accounts");
+                                    return;
+                                }
+                                if (acc.length > 0) {
+                                    console.log(acc);
+                                }
+                            });
+                        })
+                        .catch(() => {
+                            console.warn('User didn\'t allow access to accounts.');
+                            waitLogin();
+                        });
+                } else {
+                    console.log("Non-Ethereum browser detected. You should consider installing MetaMask.");
+                }
+            });
+        </script>
 	<script src="index.js"></script>
 </body>
 </html>
+
