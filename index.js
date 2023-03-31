@@ -59,116 +59,43 @@ if (s == 1) { // if 1 then make a sea square with boat polygon on top
 }
 drawGrid();
 console.log(grid);
-const ABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint8",
-				"name": "x",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "y",
-				"type": "uint8"
-			}
-		],
-		"name": "makeMove",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint8[][]",
-				"name": "board",
-				"type": "uint8[][]"
-			}
-		],
-		"name": "setGameBoard",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "player1",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "isTurn",
-				"type": "bool"
-			},
-			{
-				"internalType": "address",
-				"name": "playerAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "player2",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "isTurn",
-				"type": "bool"
-			},
-			{
-				"internalType": "address",
-				"name": "playerAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-]
-const web3 = new Web3("http://10.5.105.50:8545"); // Use the right URL for your local network
-const ethereumButton = document.querySelector('.enableEthereumButton');
-ethereumButton.addEventListener('click', () => {
-    //Check if we have Web3 provider
-    if (typeof window.ethereum != 'undefined') {
-        // Request account access
-        window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then((accounts) => {
-            console.log(accounts);
-            makeMove();
-        })
-        .catch((error) => {
-            console.error(error);
-      });
-   } else {
-       console.log("Web3 provider not found");
-   }
-});
-const x = 2;
-const y = 2;
-async function makeMove(x,y) {
-    const playerAddress = await window.ethereum.selectedAddress;
-    const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //Replace with your own Contract Address
-    const myContractInstance = new web3.eth.Contract(ABI, contractAddress);
+console.log(window.ethereum);
+const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
+let web3;
 
-    myContractInstance.methods.makeMove(x, y).send({from: playerAddress})
-     .then((result) => {
-         console.log(result);
-     })
-     .catch((error) =>{
-         console.error(error);
-     });
+async function fetchABI(web3) {
+  const response = await fetch('https://raw.githubusercontent.com/OfficialMarvin/BlockchainBattleship/main/abi.json');
+  const data = await response.json();
+  const myContract = new web3.eth.Contract(data, contractAddress);
+  console.log(myContract);
 }
 
-// Send the grid to the smart contract
-const sendGridToContract = async () => {
-  const contractAddress = '0xbbc292f8dad352900dd04d9d69a40a713b185049'; //contract address
+const contractAddress = '0x3e4a3e6c3b446fD7a59c3dAdc2ba0db9a80Fec62';
 
-  const contract = new web3.eth.Contract(ABI, contractAddress);
+async function sendGrid(web3) {
+  await fetchABI(web3);
+}
 
-  // Convert the grid to a string and send it to the contract
-  const gridString = grid.toString();
-  const tx = await contract.methods.setGameBoard(gridString).send({ from: playerAddress, gas: 100000 });
+async function connectEth(){
+  if (typeof window.ethereum !== 'undefined') {
+    try {
+      await window.ethereum.enable();
+      web3 = new Web3(window.ethereum);
+      console.log('Connected to Ethereum successfully!');
+      const userAddress = await web3.eth.getCoinbase();
+      console.log(userAddress);
+      await sendGrid(web3);
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    console.log('Please install MetaMask to connect to the Ethereum network');
+  }
+}
+
+connectEth();
+
+
+async function makeMove(playerIndex, x, y) {
+  await myContract.methods.makeMove(x, y).send({ from: playerIndex });
 }
