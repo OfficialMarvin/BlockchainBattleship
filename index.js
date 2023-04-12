@@ -1,4 +1,3 @@
-//quami
 // Create a 5x5 grid
 const gridSize = 5;
 let grid = [];
@@ -135,7 +134,7 @@ if (typeof window.ethereum !== 'undefined') {
       myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
       pullnUpdate();
     }}
-
+  pullnUpdate();
   } catch (error) {
     console.error(error);
   }
@@ -143,7 +142,6 @@ if (typeof window.ethereum !== 'undefined') {
   console.log('Please install MetaMask to connect to the Ethereum network');
 }
 
-pullnUpdate();
 
 //Build enemy grid same way but do not show boats:
 
