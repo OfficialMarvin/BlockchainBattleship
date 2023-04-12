@@ -17,11 +17,12 @@ const placeShip = (x, y) => {
 }
 
 // Allow user to place 3 ships
+function setup(){
 for (let i = 1; i < 4; i++) {
     let x = prompt('Enter the x coordinate for your ship number ' + i);
     let y = prompt('Enter the y coordinate for your ship number ' + i);
     placeShip(x, y);
-}
+}}
 const cellSize = 100;
 const svg = document.getElementById('gridcontainter');
 const enemysvg = document.getElementById('gridcontainter2');
@@ -80,60 +81,68 @@ if (typeof window.ethereum !== 'undefined') {
     console.log(myContract); //Connected to blockchain
     const coinbase = await web3.eth.getCoinbase();
     const coinbaseString = coinbase.toString();
-    myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 })
-      .then((receipt) => {
-        console.log(grid);
-        console.log(receipt);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+
     console.log("first grid sent"); //sent initial grid
     let player1 = await myContract.methods.player1().call();
     let player2 = await myContract.methods.player2().call();
     let player1Board = await myContract.methods.getPlayer1Board().call();
     let player2Board = await myContract.methods.getPlayer2Board().call();
+    let player1Turn = player1Board.isTurn;
+    let player2Turn = player2Board.isTurn;
     const isPlayer1 = player1.playerAddress.toLowerCase() === coinbase.toLowerCase();
+    
+    if (isPlayer1 && player1Board.length == 0){
+      setup();
+      myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+    console.log("player1 grid sent");}
+    if (!isPlayer1 && player2Board.length == 0){
+      setup();
+      myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+      console.log("player2 grid sent");}
 
     async function pullnUpdate() {
+      let player1Board = await myContract.methods.getPlayer1Board().call();
+      let player2Board = await myContract.methods.getPlayer2Board().call();
       if (isPlayer1) {
-        if (player2Board.length == 0) {
-          let player1Board = await myContract.methods.getPlayer1Board().call();
-          let player2Board = await myContract.methods.getPlayer2Board().call();
-          await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
-        }
         grid = player1Board;
         egrid = player2Board;
         drawGrid();
         drawEGrid(egrid);
-        console.log("Player 2 board pulled");
-        console.log(egrid);
-        // ADD LOOP WAITING FOR TURN TO ATTACK AGAIN
-      } else {
-        if (player1Board.length == 0) {
-          let player1Board = await myContract.methods.getPlayer1Board().call();
-          let player2Board = await myContract.methods.getPlayer2Board().call();
+        if (player2Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
-        }
+        console.log("Player 2 board pulled");
+        console.log(egrid);}
+      } else {
         grid = player2Board;
         egrid = player1Board;
         drawGrid();
         drawEGrid(egrid);
+        if (player1Board.length == 0) {
+          await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 1 board pulled");
-        console.log(egrid);
+        console.log(egrid);}
       }
-
-
+      console.log("start boards set");
+      player1Board = await myContract.methods.getPlayer1Board().call();
+      player2Board = await myContract.methods.getPlayer2Board().call();
+      console.log("player 1 turn: " + player1.isTurn.toString());
+      console.log("is player 1: " + isPlayer1.toString());
+  
       if (isPlayer1 && player1.isTurn){
+        console.log("player 1 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
         myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        console.log(player1.isTurn);
+        player1.isTurn = false;
         await pullnUpdate(); // call pullnUpdate() here
       }
       if (isPlayer1 == false && player2.isTurn){
+        console.log("player 2 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
         myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        player2.isTurn = false;
         await pullnUpdate(); // call pullnUpdate() here
       }
       else {
@@ -143,11 +152,18 @@ if (typeof window.ethereum !== 'undefined') {
         document.body.appendChild(waitingMessage);
       
         const waitForTurn = async () => {
-          if ((isPlayer1 && player1.isTurn) || (!isPlayer1 && player2.isTurn)) {
+          if ((isPlayer1 && player2.isTurn) || (!isPlayer1 && player1.isTurn)) {
             document.body.removeChild(waitingMessage);
-            await pullnUpdate(); // call pullnUpdate() here
+            //await pullnUpdate(); // call pullnUpdate() here
           } else {
             await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
+            // Call the getter functions to get the game boards
+            let player1Board = await myContract.methods.getPlayer1Board().call();
+            let player2Board = await myContract.methods.getPlayer2Board().call();
+
+            // Access the isTurn property of each player's game state
+            let player1Turn = player1Board.isTurn;
+            let player2Turn = player2Board.isTurn;
             await waitForTurn();
           }
         };
