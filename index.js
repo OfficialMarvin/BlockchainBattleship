@@ -1,3 +1,4 @@
+//quami
 // Create a 5x5 grid
 const gridSize = 5;
 let grid = [];
@@ -66,7 +67,7 @@ let web3;
 let egrid = [];
 
 
-const contractAddress = '0x7Bd57c0Ece2220Bdc6AB8E3Ecb4e8d8Fa808DD64';
+const contractAddress = '0x548A765cEeA6A024f1Be2f1fb45996759B16015A';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -125,52 +126,15 @@ if (typeof window.ethereum !== 'undefined') {
     if (isPlayer1 && player1.isTurn){
       let x = prompt('Enter the x coordinate for your attack');
       let y = prompt('Enter the y coordinate for your attack');
-      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 })
+      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+      pullnUpdate();
     }
     if (isPlayer1 == false && player2.isTurn){
       let x = prompt('Enter the x coordinate for your attack');
       let y = prompt('Enter the y coordinate for your attack');
-      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 })
+      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+      pullnUpdate();
     }}
-    let gridHasOnes = true;
-let egridHasOnes = true;
-
-// Check if either grid or egrid has any 1's
-while (gridHasOnes || egridHasOnes) {
-  gridHasOnes = false;
-  egridHasOnes = false;
-
-  // Check if grid has any 1's
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] === 1) {
-        gridHasOnes = true;
-        break;
-      }
-    }
-    if (gridHasOnes) {
-      break;
-    }
-  }
-
-  // Check if egrid has any 1's
-  for (let i = 0; i < egrid.length; i++) {
-    for (let j = 0; j < egrid[i].length; j++) {
-      if (egrid[i][j] === 1) {
-        egridHasOnes = true;
-        break;
-      }
-    }
-    if (egridHasOnes) {
-      break;
-    }
-  }
-
-  // If either grid or egrid has any 1's, call pullnUpdate()
-  if (gridHasOnes || egridHasOnes) {
-    await pullnUpdate();
-  }
-}
 
   } catch (error) {
     console.error(error);
@@ -179,6 +143,7 @@ while (gridHasOnes || egridHasOnes) {
   console.log('Please install MetaMask to connect to the Ethereum network');
 }
 
+pullnUpdate();
 
 //Build enemy grid same way but do not show boats:
 
