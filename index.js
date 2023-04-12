@@ -91,57 +91,76 @@ if (typeof window.ethereum !== 'undefined') {
     console.log("first grid sent"); //sent initial grid
     let player1 = await myContract.methods.player1().call();
     let player2 = await myContract.methods.player2().call();
+    let player1Board = await myContract.methods.getPlayer1Board().call();
+    let player2Board = await myContract.methods.getPlayer2Board().call();
     const isPlayer1 = player1.playerAddress.toLowerCase() === coinbase.toLowerCase();
 
     async function pullnUpdate() {
-      let egrid = [];
-      let player1Board = [];
-      let player2Board = [];
       if (isPlayer1) {
-        while (player2Board == []) {
-          player1Board = await myContract.methods.getPlayer1Board().call();
-          player2Board = await myContract.methods.getPlayer2Board().call();
+        if (player2Board.length == 0) {
+          let player1Board = await myContract.methods.getPlayer1Board().call();
+          let player2Board = await myContract.methods.getPlayer2Board().call();
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         }
         grid = player1Board;
         egrid = player2Board;
+        drawGrid();
+        drawEGrid(egrid);
         console.log("Player 2 board pulled");
+        console.log(egrid);
+        // ADD LOOP WAITING FOR TURN TO ATTACK AGAIN
       } else {
-        while (player1Board == []) {
-          player1Board = await myContract.methods.getPlayer1Board().call();
-          player2Board = await myContract.methods.getPlayer2Board().call();
+        if (player1Board.length == 0) {
+          let player1Board = await myContract.methods.getPlayer1Board().call();
+          let player2Board = await myContract.methods.getPlayer2Board().call();
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         }
-        grid = player2Board
+        grid = player2Board;
         egrid = player1Board;
+        drawGrid();
+        drawEGrid(egrid);
         console.log("Player 1 board pulled");
+        console.log(egrid);
       }
-    
-      // Update grids
-      drawGrid()
-      drawEGrid(egrid);
-      console.log(egrid);
 
-    if (isPlayer1 && player1.isTurn){
-      let x = prompt('Enter the x coordinate for your attack');
-      let y = prompt('Enter the y coordinate for your attack');
-      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
-      pullnUpdate();
+
+      if (isPlayer1 && player1.isTurn){
+        let x = prompt('Enter the x coordinate for your attack');
+        let y = prompt('Enter the y coordinate for your attack');
+        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        await pullnUpdate(); // call pullnUpdate() here
+      }
+      if (isPlayer1 == false && player2.isTurn){
+        let x = prompt('Enter the x coordinate for your attack');
+        let y = prompt('Enter the y coordinate for your attack');
+        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        await pullnUpdate(); // call pullnUpdate() here
+      }
+      else {
+        const waitingMessage = document.createElement('div');
+        waitingMessage.id = 'waiting-message';
+        waitingMessage.innerText = 'Waiting for the next player to move...';
+        document.body.appendChild(waitingMessage);
+      
+        const waitForTurn = async () => {
+          if ((isPlayer1 && player1.isTurn) || (!isPlayer1 && player2.isTurn)) {
+            document.body.removeChild(waitingMessage);
+            await pullnUpdate(); // call pullnUpdate() here
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
+            await waitForTurn();
+          }
+        };
+        await waitForTurn();
+      }
     }
-    if (isPlayer1 == false && player2.isTurn){
-      let x = prompt('Enter the x coordinate for your attack');
-      let y = prompt('Enter the y coordinate for your attack');
-      myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
-      pullnUpdate();
-    }}
-  pullnUpdate();
+    await pullnUpdate(); // call pullnUpdate() here to run it once initially
   } catch (error) {
     console.error(error);
   }
 } else {
   console.log('Please install MetaMask to connect to the Ethereum network');
 }
-
 
 //Build enemy grid same way but do not show boats:
 
