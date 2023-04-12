@@ -66,7 +66,7 @@ let web3;
 let egrid = [];
 
 
-const contractAddress = '0x548eAA3DA0E4d8F305101a575d07AB2405f66A24';
+const contractAddress = '0xffDeB98Caf6e4cb50c6DB2Fc0a73DbD3F06b6796';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -120,7 +120,7 @@ if (typeof window.ethereum !== 'undefined') {
       // Update grids
       drawGrid()
       drawEGrid(egrid);
-    }
+    
     console.log(egrid)
     if (isPlayer1 && player1.isTurn){
       let x = prompt('Enter the x coordinate for your attack');
@@ -131,17 +131,53 @@ if (typeof window.ethereum !== 'undefined') {
       let x = prompt('Enter the x coordinate for your attack');
       let y = prompt('Enter the y coordinate for your attack');
       myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 })
+    }}
+    let gridHasOnes = true;
+let egridHasOnes = true;
+
+// Check if either grid or egrid has any 1's
+while (gridHasOnes || egridHasOnes) {
+  gridHasOnes = false;
+  egridHasOnes = false;
+
+  // Check if grid has any 1's
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] === 1) {
+        gridHasOnes = true;
+        break;
+      }
     }
-    pullnUpdate();
+    if (gridHasOnes) {
+      break;
+    }
+  }
+
+  // Check if egrid has any 1's
+  for (let i = 0; i < egrid.length; i++) {
+    for (let j = 0; j < egrid[i].length; j++) {
+      if (egrid[i][j] === 1) {
+        egridHasOnes = true;
+        break;
+      }
+    }
+    if (egridHasOnes) {
+      break;
+    }
+  }
+
+  // If either grid or egrid has any 1's, call pullnUpdate()
+  if (gridHasOnes || egridHasOnes) {
+    await pullnUpdate();
+  }
+}
+
   } catch (error) {
     console.error(error);
   }
 } else {
   console.log('Please install MetaMask to connect to the Ethereum network');
 }
-
-
-  
 
 
 //Build enemy grid same way but do not show boats:
