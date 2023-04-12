@@ -24,6 +24,7 @@ for (let i = 1; i < 4; i++) {
 }
 const cellSize = 100;
 const svg = document.getElementById('gridcontainter');
+const enemysvg = document.getElementById('gridcontainter2');
 
 
 function drawGrid() {   
@@ -107,7 +108,56 @@ async function connectEth(){
 
 connectEth();
 
+//Build enemy grid same way but do not show boats:
+const egrid = [];
+for (let i = 0; i < gridSize; i++) {
+  egrid[i] = new Array(gridSize).fill(0);
+}
+
+function drawEGrid() {   
+  for (let y = 0; y < egrid.length; y++) {   
+      for (let x = 0; x < egrid[y].length; x++) {   
+          if (egrid[y][x] < 4) {   
+              drawEShip(x * cellSize, y * cellSize, egrid[y][x] );}}}}
+
+
+function drawEShip(x, y, s) {
+if (s < 2){ // if 0 then make a blank sea square
+  const sea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  sea.setAttribute('x', x);
+  sea.setAttribute('y', y);
+  sea.setAttribute('width', cellSize);
+  sea.setAttribute('height', cellSize);
+  sea.setAttribute('fill', '#0080FF');
+  enemysvg.appendChild(sea);}
+if (s == 3) { // if 3 then make a sea square with red boat polygon on top
+  const sea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  sea.setAttribute('x', x);
+  sea.setAttribute('y', y);
+  sea.setAttribute('width','100');
+  sea.setAttribute('height','100'); 
+  sea.setAttribute("fill", "#0080FF");
+  const boat = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  const pointsString = `${50 + x},${5 + y} ${75 + x},${30 + y} ${75 + x},${95 + y} ${25 + x},${95 + y} ${25 + x},${30+ y}`;
+  boat.setAttribute("points", pointsString);
+  boat.style.fill="#FF0000";
+  boat.style.stroke="black";
+  enemysvg.appendChild(sea);
+  enemysvg.appendChild(boat);}
+if (s == 2){
+  const sea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  sea.setAttribute('x', x);
+  sea.setAttribute('y', y);
+  sea.setAttribute('width', cellSize);
+  sea.setAttribute('height', cellSize);
+  sea.setAttribute('fill', '#ECFF00');
+  enemysvg.appendChild(sea);}
+}
+drawEGrid();
+
+
+//PULL IN ENEMY GRID FROM CONTRACT THEN CREATE MAKEMOVE GAME LOOP DRAWING GRID AND EGRID AFTER EVERY TURN
 
 async function makeMove(playerIndex, x, y) {
-  await myContract.methods.makeMove(x, y).send({ from: web3.eth.getCoinbase().toString() });
+  await myContract.methods.makeMove(x, y).send({ from: playerIndex });
 }
