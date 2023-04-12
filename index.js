@@ -66,7 +66,7 @@ let web3;
 let egrid = [];
 
 
-const contractAddress = '0xffDeB98Caf6e4cb50c6DB2Fc0a73DbD3F06b6796';
+const contractAddress = '0x7Bd57c0Ece2220Bdc6AB8E3Ecb4e8d8Fa808DD64';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -91,14 +91,14 @@ if (typeof window.ethereum !== 'undefined') {
     console.log("first grid sent"); //sent initial grid
     let player1 = await myContract.methods.player1().call();
     let player2 = await myContract.methods.player2().call();
-    let isPlayer1 = player1.playerAddress.toLowerCase() === coinbase.toLowerCase();
+    const isPlayer1 = player1.playerAddress.toLowerCase() === coinbase.toLowerCase();
 
     async function pullnUpdate() {
       let egrid = [];
       let player1Board = [];
       let player2Board = [];
       if (isPlayer1) {
-        while (player2Board.length == 0) {
+        while (player2Board == []) {
           player1Board = await myContract.methods.getPlayer1Board().call();
           player2Board = await myContract.methods.getPlayer2Board().call();
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
@@ -107,7 +107,7 @@ if (typeof window.ethereum !== 'undefined') {
         egrid = player2Board;
         console.log("Player 2 board pulled");
       } else {
-        while (player1Board.length == 0) {
+        while (player1Board == []) {
           player1Board = await myContract.methods.getPlayer1Board().call();
           player2Board = await myContract.methods.getPlayer2Board().call();
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
@@ -120,8 +120,8 @@ if (typeof window.ethereum !== 'undefined') {
       // Update grids
       drawGrid()
       drawEGrid(egrid);
-    
-    console.log(egrid)
+      console.log(egrid);
+
     if (isPlayer1 && player1.isTurn){
       let x = prompt('Enter the x coordinate for your attack');
       let y = prompt('Enter the y coordinate for your attack');
