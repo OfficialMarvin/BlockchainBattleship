@@ -68,9 +68,21 @@ async function fetchABI(web3) {
   const data = await response.json();
   const myContract = new web3.eth.Contract(data, contractAddress);
   console.log(myContract);
+  const coinbase = await web3.eth.getCoinbase();
+  const coinbaseString = coinbase.toString();
+  myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 })
+  .then((receipt) => {
+    console.log(grid);
+    console.log(receipt);
+  })
+  .catch((error) => {
+    // Handle error
+    console.error(error);
+  });
+  console.log("grid attempted send");
 }
 
-const contractAddress = '0x3e4a3e6c3b446fD7a59c3dAdc2ba0db9a80Fec62';
+const contractAddress = '0x548eAA3DA0E4d8F305101a575d07AB2405f66A24';
 
 async function sendGrid(web3) {
   await fetchABI(web3);
@@ -84,7 +96,7 @@ async function connectEth(){
       console.log('Connected to Ethereum successfully!');
       const userAddress = await web3.eth.getCoinbase();
       console.log(userAddress);
-      await sendGrid(web3);
+      sendGrid(web3);
     } catch (error) {
       console.error(error);
     }
@@ -97,5 +109,5 @@ connectEth();
 
 
 async function makeMove(playerIndex, x, y) {
-  await myContract.methods.makeMove(x, y).send({ from: playerIndex });
+  await myContract.methods.makeMove(x, y).send({ from: web3.eth.getCoinbase().toString() });
 }
