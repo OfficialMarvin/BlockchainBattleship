@@ -123,7 +123,7 @@ if (typeof window.ethereum !== 'undefined') {
     async function pullnUpdate() {
       let player1Board = await myContract.methods.getPlayer1Board().call();
       let player2Board = await myContract.methods.getPlayer2Board().call();
-      if (isPlayer1) {
+      if (isPlayer1 && player2Board.length == 0) {
         grid = player1Board;
         egrid = player2Board;
         drawGrid(grid);
@@ -132,9 +132,9 @@ if (typeof window.ethereum !== 'undefined') {
         if (player2Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 2 board pulled");
-        location.reload();
         console.log(egrid);}
-      } else { //set player and enemy board according to player number, update arrays
+        pullnUpdate();
+      } else if (!isPlayer1 && player1Board.length == 0) { //set player and enemy board according to player number, update arrays
         grid = player2Board;
         egrid = player1Board;
         drawGrid(grid);
@@ -144,7 +144,7 @@ if (typeof window.ethereum !== 'undefined') {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 1 board pulled");
         console.log(egrid);}
-        location.reload();
+        pullnUpdate();
       }
       console.log("start boards set");
       player1Board = await myContract.methods.getPlayer1Board().call();
