@@ -25,7 +25,7 @@ const cellSize = 100;
 const svg = document.getElementById('gridcontainter');
 const enemysvg = document.getElementById('gridcontainter2');
 // draw grid correct size
-function drawGrid() {   
+function drawGrid(grid) {   
     for (let y = 0; y < grid.length; y++) {   
         for (let x = 0; x < grid[y].length; x++) {   
             if (grid[y][x] < 4) {   
@@ -83,13 +83,13 @@ if (s == 3) { // if 3 then make a sea square with red boat polygon on top
     enemysvg.appendChild(sea);
     enemysvg.appendChild(boat);}
     }
-drawGrid();
+drawGrid(grid);
 console.log(grid);
 console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0x548A765cEeA6A024f1Be2f1fb45996759B16015A';
+const contractAddress = '0xbc58b0120aa46684912c77735e31b3424aa9b8d9';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -124,7 +124,7 @@ if (typeof window.ethereum !== 'undefined') {
       if (isPlayer1) {
         grid = player1Board;
         egrid = player2Board;
-        drawGrid();
+        drawGrid(grid);
         drawEGrid(egrid);
         if (player2Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
@@ -133,7 +133,7 @@ if (typeof window.ethereum !== 'undefined') {
       } else { //set player and enemy board according to player number, update arrays
         grid = player2Board;
         egrid = player1Board;
-        drawGrid();
+        drawGrid(grid);
         drawEGrid(egrid);
         if (player1Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
@@ -152,18 +152,27 @@ if (typeof window.ethereum !== 'undefined') {
         console.log("player 1 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
-        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        let tx = await myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
         console.log(player1.isTurn);
         player1.isTurn = false;
-        await pullnUpdate(); // recursive board update
+        await tx.wait(); // wait for the transaction to be confirmed
+  setTimeout(async () => {
+    await pullnUpdate(); // recursive board update after 3 seconds delay
+  }, 3000);
+        console.log("tx wait over")
+
       }
       else if (isPlayer1 == false && player2.isTurn){ //let player2 attack if it is their turn 
         console.log("player 2 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
-        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        let tx = await myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
         player2.isTurn = false;
-        await pullnUpdate(); // board update again
+        await tx.wait(); // wait for the transaction to be confirmed
+        setTimeout(async () => {
+          await pullnUpdate(); // recursive board update after 3 seconds delay
+        }, 3000);
+        console.log("tx wait over")
       }
       else {
         const waitingMessage = document.createElement('div');
