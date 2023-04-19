@@ -1,45 +1,20 @@
 [
 	{
-		"inputs": [],
-		"name": "checkForWinner",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
+		"anonymous": false,
 		"inputs": [
 			{
-				"internalType": "uint8",
-				"name": "x",
-				"type": "uint8"
-			},
-			{
-				"internalType": "uint8",
-				"name": "y",
-				"type": "uint8"
+				"indexed": false,
+				"internalType": "address",
+				"name": "winner",
+				"type": "address"
 			}
 		],
-		"name": "makeMove",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
+		"name": "GameOver",
+		"type": "event"
 	},
 	{
 		"inputs": [],
-		"name": "reset",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint8[][]",
-				"name": "board",
-				"type": "uint8[][]"
-			}
-		],
-		"name": "setGameBoard",
+		"name": "checkForWinner",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -68,6 +43,24 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "x",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "y",
+				"type": "uint8"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -104,6 +97,26 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "reset",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8[][]",
+				"name": "board",
+				"type": "uint8[][]"
+			}
+		],
+		"name": "setGameBoard",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]
