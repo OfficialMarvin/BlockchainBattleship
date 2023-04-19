@@ -126,6 +126,7 @@ if (typeof window.ethereum !== 'undefined') {
         egrid = player2Board;
         drawGrid(grid);
         drawEGrid(egrid);
+        console.log("BOARD LENGTH p2: " + player2Board.length.toString());
         if (player2Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 2 board pulled");
@@ -136,6 +137,7 @@ if (typeof window.ethereum !== 'undefined') {
         egrid = player1Board;
         drawGrid(grid);
         drawEGrid(egrid);
+        console.log("BOARD LENGTH p1: " + player1Board.length.toString());
         if (player1Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 1 board pulled");
@@ -176,19 +178,21 @@ if (typeof window.ethereum !== 'undefined') {
         waitingMessage.id = 'waiting-message';
         waitingMessage.innerText = 'Wait 25 seconds to send move on chain...';
         document.body.appendChild(waitingMessage);
-        await new Promise(resolve => setTimeout(resolve, 25000));
+        await new Promise(resolve => setTimeout(resolve, 30000));
         document.body.removeChild(waitingMessage);
         console.log("tx wait over");
         pullnUpdate();
       }
-      else if (isPlayer1 && player2.isTurn || isPlayer1 == false && player1.isTurn){
-        const waitingMessage = document.createElement('div');
-        waitingMessage.id = 'waiting-message';
-        waitingMessage.innerText = 'Waiting for the next player to move...';
-        document.body.appendChild(waitingMessage);
+      else if ((isPlayer1 && player2.isTurn) || (!isPlayer1 && player1.isTurn)){
+        console.log("hit else")
+        const waitingMessage2 = document.createElement('div');
+        waitingMessage2.id = 'waiting-message';
+        waitingMessage2.innerText = 'Waiting for the next player to move...';
+        document.body.appendChild(waitingMessage2);
         const waitForTurn = async () => {
-          if ((isPlayer1 && player2.isTurn) || (!isPlayer1 && player1.isTurn)) { //wait if not turn
-            document.body.removeChild(waitingMessage);
+          if ((isPlayer1 && player1.isTurn) || (!isPlayer1 && player2.isTurn)) { //wait if not turn
+            console.log("wait message gone")
+            document.body.removeChild(waitingMessage2);
           } else {
             await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
             // pull boards from chain to update player structure
@@ -197,7 +201,7 @@ if (typeof window.ethereum !== 'undefined') {
             // read turns from chain
             player1 = await myContract.methods.player1().call();
             player2 = await myContract.methods.player2().call();
-            //location.reload();
+            location.reload();
             await waitForTurn();
           }
         };
