@@ -129,6 +129,7 @@ if (typeof window.ethereum !== 'undefined') {
         if (player2Board.length == 0) {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 2 board pulled");
+        location.reload();
         console.log(egrid);}
       } else { //set player and enemy board according to player number, update arrays
         grid = player2Board;
@@ -139,6 +140,7 @@ if (typeof window.ethereum !== 'undefined') {
           await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
         console.log("Player 1 board pulled");
         console.log(egrid);}
+        location.reload();
       }
       console.log("start boards set");
       player1Board = await myContract.methods.getPlayer1Board().call();
@@ -179,7 +181,7 @@ if (typeof window.ethereum !== 'undefined') {
         console.log("tx wait over");
         pullnUpdate();
       }
-      else {
+      else if (isPlayer1 && player2.isTurn || isPlayer1 == false && player1.isTurn){
         const waitingMessage = document.createElement('div');
         waitingMessage.id = 'waiting-message';
         waitingMessage.innerText = 'Waiting for the next player to move...';
@@ -195,6 +197,7 @@ if (typeof window.ethereum !== 'undefined') {
             // read turns from chain
             player1 = await myContract.methods.player1().call();
             player2 = await myContract.methods.player2().call();
+            location.reload();
             await waitForTurn();
           }
         };
