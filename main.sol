@@ -7,11 +7,11 @@ struct GameState {
     bool isTurn;
     address playerAddress;
 }
-
 // define contract
 contract Battleship {
     GameState public player1;
     GameState public player2;
+    event GameOver(address winner);
 
     function setGameBoard(uint8[][] memory board) public {
 
@@ -95,6 +95,7 @@ contract Battleship {
     if (!player1HasShips) {
         // send contract balance to player 2
         payable(player2.playerAddress).transfer(address(this).balance);
+        emit GameOver(player2.playerAddress);
         // reset game
         reset();
         return;
@@ -118,6 +119,7 @@ contract Battleship {
     if (!player2HasShips) {
         // send contract balance to player 1
         payable(player1.playerAddress).transfer(address(this).balance);
+        emit GameOver(player1.playerAddress);
         // reset
         reset();
         return;
