@@ -112,10 +112,12 @@ if (typeof window.ethereum !== 'undefined') {
     if (isPlayer1 && player1Board.length == 0){
       setup();
       myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+      await new Promise(resolve => setTimeout(resolve, 45000));
     console.log("player1 grid sent");}
     if (!isPlayer1 && player2Board.length == 0){
       setup();
       myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+      await new Promise(resolve => setTimeout(resolve, 45000));
       console.log("player2 grid sent");}
     // main recursive game loop
     async function pullnUpdate() {
