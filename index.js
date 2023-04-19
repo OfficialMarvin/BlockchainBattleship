@@ -152,29 +152,32 @@ if (typeof window.ethereum !== 'undefined') {
         console.log("player 1 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
-        let tx = await myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
         console.log(player1.isTurn);
         player1.isTurn = false;
-        await tx.wait(); // wait for the transaction to be confirmed
-  setTimeout(async () => {
-    location.reload();
-    await pullnUpdate(); // recursive board update after 3 seconds delay
-  }, 3000);
-        console.log("tx wait over")
-
+        const waitingMessage = document.createElement('div');
+        waitingMessage.id = 'waiting-message';
+        waitingMessage.innerText = 'Wait 25 seconds to send move on chain...';
+        document.body.appendChild(waitingMessage);
+        await new Promise(resolve => setTimeout(resolve, 25000));
+        document.body.removeChild(waitingMessage);
+        console.log("tx wait over");
+        pullnUpdate();
       }
       else if (isPlayer1 == false && player2.isTurn){ //let player2 attack if it is their turn 
         console.log("player 2 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
-        let tx = await myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
+        myContract.methods.makeMove(x,y).send({ from: coinbaseString, gas: 1000000 });
         player2.isTurn = false;
-        await tx.wait(); // wait for the transaction to be confirmed
-        setTimeout(async () => {
-          location.reload();
-          await pullnUpdate(); // recursive board update after 3 seconds delay
-        }, 3000);
-        console.log("tx wait over")
+        const waitingMessage = document.createElement('div');
+        waitingMessage.id = 'waiting-message';
+        waitingMessage.innerText = 'Wait 25 seconds to send move on chain...';
+        document.body.appendChild(waitingMessage);
+        await new Promise(resolve => setTimeout(resolve, 25000));
+        document.body.removeChild(waitingMessage);
+        console.log("tx wait over");
+        pullnUpdate();
       }
       else {
         const waitingMessage = document.createElement('div');
@@ -205,6 +208,7 @@ if (typeof window.ethereum !== 'undefined') {
 } else {
   console.log('Please install MetaMask to connect to the Ethereum network'); // incase metamask not detected
 }
+
 //Build enemy grid same way but do not show ships:
 function drawEGrid(egrid) {   
   for (let y = 0; y < egrid.length; y++) {   
