@@ -157,6 +157,7 @@ if (typeof window.ethereum !== 'undefined') {
         player1.isTurn = false;
         await tx.wait(); // wait for the transaction to be confirmed
   setTimeout(async () => {
+    location.reload();
     await pullnUpdate(); // recursive board update after 3 seconds delay
   }, 3000);
         console.log("tx wait over")
@@ -170,6 +171,7 @@ if (typeof window.ethereum !== 'undefined') {
         player2.isTurn = false;
         await tx.wait(); // wait for the transaction to be confirmed
         setTimeout(async () => {
+          location.reload();
           await pullnUpdate(); // recursive board update after 3 seconds delay
         }, 3000);
         console.log("tx wait over")
