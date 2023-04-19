@@ -106,9 +106,7 @@ if (typeof window.ethereum !== 'undefined') {
     let player1 = await myContract.methods.player1().call();
     let player2 = await myContract.methods.player2().call();
     let player1Board = await myContract.methods.getPlayer1Board().call();
-    let player2Board = await myContract.methods.getPlayer2Board().call();
-    let player1Turn = player1Board.isTurn; //pull players, boards, and addresses from chain
-    let player2Turn = player2Board.isTurn;
+    let player2Board = await myContract.methods.getPlayer2Board().call(); //pull players, boards, and addresses from chain
     const isPlayer1 = player1.playerAddress.toLowerCase() === coinbase.toLowerCase(); //var to see if user p1 or p2
     // if start board has not been set then setup for either player
     if (isPlayer1 && player1Board.length == 0){
@@ -145,6 +143,8 @@ if (typeof window.ethereum !== 'undefined') {
       console.log("start boards set");
       player1Board = await myContract.methods.getPlayer1Board().call();
       player2Board = await myContract.methods.getPlayer2Board().call();
+      player1 = await myContract.methods.player1().call();
+      player2 = await myContract.methods.player2().call();
       console.log("player 1 turn: " + player1.isTurn.toString());
       console.log("is player 1: " + isPlayer1.toString());
   
@@ -157,7 +157,7 @@ if (typeof window.ethereum !== 'undefined') {
         player1.isTurn = false;
         await pullnUpdate(); // recursive board update
       }
-      if (isPlayer1 == false && player2.isTurn){ //let player2 attack if it is their turn 
+      else if (isPlayer1 == false && player2.isTurn){ //let player2 attack if it is their turn 
         console.log("player 2 attack time")
         let x = prompt('Enter the x coordinate for your attack');
         let y = prompt('Enter the y coordinate for your attack');
@@ -176,11 +176,11 @@ if (typeof window.ethereum !== 'undefined') {
           } else {
             await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
             // pull boards from chain to update player structure
-            let player1Board = await myContract.methods.getPlayer1Board().call();
-            let player2Board = await myContract.methods.getPlayer2Board().call();
+            player1Board = await myContract.methods.getPlayer1Board().call();
+            player2Board = await myContract.methods.getPlayer2Board().call();
             // read turns from chain
-            let player1Turn = player1Board.isTurn;
-            let player2Turn = player2Board.isTurn;
+            player1 = await myContract.methods.player1().call();
+            player2 = await myContract.methods.player2().call();
             await waitForTurn();
           }
         };
