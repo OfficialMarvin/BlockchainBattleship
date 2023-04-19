@@ -197,7 +197,7 @@ if (typeof window.ethereum !== 'undefined') {
             // read turns from chain
             player1 = await myContract.methods.player1().call();
             player2 = await myContract.methods.player2().call();
-            location.reload();
+            //location.reload();
             await waitForTurn();
           }
         };
