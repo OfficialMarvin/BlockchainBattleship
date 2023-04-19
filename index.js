@@ -1,3 +1,4 @@
+
 // 5x5 grid for board
 const gridSize = 5;
 let grid = [];
@@ -89,7 +90,7 @@ console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0xbc58b0120aa46684912c77735e31b3424aa9b8d9';
+const contractAddress = '0x6B8FDC5C1adDD027DD3b67A17caDF9A25cC1C2CA';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -100,6 +101,17 @@ if (typeof window.ethereum !== 'undefined') {
     const response = await fetch('https://raw.githubusercontent.com/OfficialMarvin/BlockchainBattleship/main/abi.json'); //abi from github
     const data = await response.json();
     const myContract = new web3.eth.Contract(data, contractAddress); //connect to blockchain
+    /*
+    myContract.events.GameOver(function(error, result) {
+      if (!error) {
+        if (result.returnValues.winner === myContract.methods.player1().call().playerAddress) {
+          alert("Player 1 wins!"); // display popup indicating player 1 wins
+        } else {
+          alert("Player 2 wins!"); // display popup indicating player 2 wins
+        }
+      }
+    });
+    */
     console.log(myContract);
     const coinbase = await web3.eth.getCoinbase();
     const coinbaseString = coinbase.toString(); //get user address
@@ -112,12 +124,22 @@ if (typeof window.ethereum !== 'undefined') {
     if (isPlayer1 && player1Board.length == 0){
       setup();
       myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+      const waitingMessage2 = document.createElement('div');
+      waitingMessage2.id = 'waiting-message';
+      waitingMessage2.innerText = 'Sending board & waiting for opponent';
+      document.body.appendChild(waitingMessage2);
       await new Promise(resolve => setTimeout(resolve, 45000));
+      document.body.removeChild(waitingMessage);
     console.log("player1 grid sent");}
     if (!isPlayer1 && player2Board.length == 0){
       setup();
       myContract.methods.setGameBoard(grid).send({ from: coinbaseString, gas: 1000000 });
+      const waitingMessage2 = document.createElement('div');
+      waitingMessage2.id = 'waiting-message';
+      waitingMessage2.innerText = 'Sending board & waiting for opponent';
+      document.body.appendChild(waitingMessage2);
       await new Promise(resolve => setTimeout(resolve, 45000));
+      document.body.removeChild(waitingMessage2);
       console.log("player2 grid sent");}
     // main recursive game loop
     async function pullnUpdate() {
@@ -146,7 +168,7 @@ if (typeof window.ethereum !== 'undefined') {
       player2 = await myContract.methods.player2().call();
       console.log("player 1 turn: " + player1.isTurn.toString());
       console.log("is player 1: " + isPlayer1.toString());
-  
+     
       if (isPlayer1 && player1.isTurn){ //let player1 attack if it is their turn 
         console.log("player 1 attack time")
         let x = prompt('Enter the x coordinate for your attack');
@@ -189,7 +211,7 @@ if (typeof window.ethereum !== 'undefined') {
             console.log("wait message gone")
             document.body.removeChild(waitingMessage2);
           } else {
-            await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before checking again
+            await new Promise(resolve => setTimeout(resolve, 3000)); // wait for 1 second before checking again
             // pull boards from chain to update player structure
             player1Board = await myContract.methods.getPlayer1Board().call();
             player2Board = await myContract.methods.getPlayer2Board().call();
@@ -201,8 +223,8 @@ if (typeof window.ethereum !== 'undefined') {
           }
         };
         await waitForTurn();
-      }
-    }
+      };
+    };
     await pullnUpdate(); // call loop as first run, rest is recursive
   } catch (error) {
     console.error(error);
