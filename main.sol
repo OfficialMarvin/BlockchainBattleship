@@ -7,12 +7,29 @@ struct GameState {
     bool isTurn;
     address playerAddress;
 }
+//struct for messages sent by players
+struct Message {
+        address sender;
+        uint timestamp;
+        string text;
+}
 // define contract
 contract Battleship {
     GameState public player1;
     GameState public player2;
-    event GameOver(address winner);
+    Message[] public chatHistory;
+	event GameOver(address winner);
+	
+	function sendMessage(string memory text) public {
+        require(msg.sender == player1.playerAddress || msg.sender == player2.playerAddress, "Only players can send messages");
+        require(bytes(text).length > 0, "Message is empty");
+        chatHistory.push(Message(msg.sender, block.timestamp, text));
+    }
 
+    function getChatHistory() public view returns (Message[] memory) {
+        return chatHistory;
+    }
+   
     function setGameBoard(uint8[][] memory board) public {
 
         // check whose turn and set board and turns accordingly

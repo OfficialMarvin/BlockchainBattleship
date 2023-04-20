@@ -14,6 +14,20 @@ const placeShip = (x, y) => {
     return false;
   }
 }
+// displays the chat history from the contract
+async function displayChatHistory() {
+  const chatHistory = await contract.methods.getChatHistory().call();
+  const chatContainer = document.getElementById("chat-container");
+  chatContainer.innerHTML = "";
+
+  chatHistory.forEach(chat => {
+    const timestamp = new Date(chat.timestamp * 1000);
+    const message = `${timestamp.toLocaleString()}: ${chat.message}`;
+    const chatDiv = document.createElement("div");
+    chatDiv.innerText = message;
+    chatContainer.appendChild(chatDiv);
+  });
+}
 // prompt & let user place 3 ships
 function setup(){
 for (let i = 1; i < 4; i++) {
