@@ -105,7 +105,7 @@ console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0x31a05c142ea23f1f0f4c868b0fe8e23c65a19baa';
+const contractAddress = '0xB9E37151D2A473536F015758f4050403eA4621f5';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -132,11 +132,21 @@ if (typeof window.ethereum !== 'undefined') {
     */
 
     function addMessage(message) {
+      const messageString = String(message);
+      const messages = messageString.split(',');
+      let formattedMessages = [];
+      for (let i = 0; i < messages.length; i=i+3) {
+      const prefix = messages[i].slice(0, 5);
+      const suffix = messages[i+2];
+      formattedMessages.push(prefix + ': ' + suffix);
+      }
+      const formattedMessage = formattedMessages.join();
       const messagesElement = document.querySelector('.messages');
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
-      messageElement.textContent = message;
+      messageElement.textContent = formattedMessage;
       messagesElement.appendChild(messageElement);
+      console.log("message string "+ formattedMessage);
     }
   
     // Define a function to retrieve the latest message from the smart contract and add it to the chatbox
