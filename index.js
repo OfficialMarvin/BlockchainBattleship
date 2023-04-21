@@ -105,7 +105,7 @@ console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0xB9E37151D2A473536F015758f4050403eA4621f5';
+const contractAddress = '0xb2225659B1F1fa5E4cC71612195806f7bEdD68e6';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -115,10 +115,9 @@ if (typeof window.ethereum !== 'undefined') {
     console.log(userAddress);
     const response = await fetch('https://raw.githubusercontent.com/OfficialMarvin/BlockchainBattleship/main/abi.json'); //abi from github
     const data = await response.json();
-    const myContract = new web3.eth.Contract(data, contractAddress);
-    //myContract.methods.sendMessage("Test message").send({from: userAddress, gas: 1000000}); THIS LINE WORKS
+    const myContract = new web3.eth.Contract(data, contractAddress); //connect to blockchain
 
-     //connect to blockchain
+     
     /*
     myContract.events.GameOver(function(error, result) {
       if (!error) {
@@ -155,7 +154,9 @@ if (typeof window.ethereum !== 'undefined') {
         if (error) {
           console.error(error);
         } else {
-          addMessage(result);
+          if (!(result.length == 0)){
+            console.log("why add: " + typeof result);
+          addMessage(result);}
         }
       });
     }
