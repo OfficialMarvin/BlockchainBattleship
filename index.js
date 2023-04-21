@@ -16,15 +16,16 @@ const placeShip = (x, y) => {
 }
 // displays the chat history from the contract
 async function displayChatHistory() {
-  const chatHistory = await contract.methods.getChatHistory().call();
+  const chatHistory = await myContract.methods.getChatHistory().call();
   const chatContainer = document.getElementById("chat-container");
   chatContainer.innerHTML = "";
 
   chatHistory.forEach(chat => {
     const timestamp = new Date(chat.timestamp * 1000);
     const message = `${timestamp.toLocaleString()}: ${chat.message}`;
+    const formattedMessage = "0x"+message.slice(0, 2) + message.slice(39,42) + ': ' + message.slice(168);
     const chatDiv = document.createElement("div");
-    chatDiv.innerText = message;
+    chatDiv.innerText = formattedMessage;
     chatContainer.appendChild(chatDiv);
   });
 }
@@ -104,7 +105,7 @@ console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0x6B8FDC5C1adDD027DD3b67A17caDF9A25cC1C2CA';
+const contractAddress = '0x31a05c142ea23f1f0f4c868b0fe8e23c65a19baa';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
@@ -114,7 +115,10 @@ if (typeof window.ethereum !== 'undefined') {
     console.log(userAddress);
     const response = await fetch('https://raw.githubusercontent.com/OfficialMarvin/BlockchainBattleship/main/abi.json'); //abi from github
     const data = await response.json();
-    const myContract = new web3.eth.Contract(data, contractAddress); //connect to blockchain
+    const myContract = new web3.eth.Contract(data, contractAddress);
+    //myContract.methods.sendMessage("Test message").send({from: userAddress, gas: 1000000}); THIS LINE WORKS
+
+     //connect to blockchain
     /*
     myContract.events.GameOver(function(error, result) {
       if (!error) {
@@ -126,7 +130,61 @@ if (typeof window.ethereum !== 'undefined') {
       }
     });
     */
+
+    function addMessage(message) {
+      const messagesElement = document.querySelector('.messages');
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.textContent = message;
+      messagesElement.appendChild(messageElement);
+    }
+  
+    // Define a function to retrieve the latest message from the smart contract and add it to the chatbox
+    function updateMessages() {
+      myContract.methods.getChatHistory().call(function(error, result) {
+        if (error) {
+          console.error(error);
+        } else {
+          addMessage(result);
+        }
+      });
+    }
+  
+    // Define a function to send a message to the smart contract and update the chatbox
+    function sendMessage(message) {
+      myContract.methods.sendMessage(message + "\n").send({from: userAddress}, function(error, transactionHash) {
+        if (error) {
+          console.error(error);
+        } else {
+          console.log('Transaction hash:', transactionHash);
+          addMessage(message);
+        }
+      });
+    }
+  
+    // Handle form submit event to send a message
+    const submitButton = document.querySelector('.btn-send');
+    submitButton.addEventListener('click', function() {
+    event.preventDefault();
+    const inputElement = document.querySelector('.input-message');
+    const message = (inputElement.value.trim()).toString();
+    if (message !== '') {
+    sendMessage(message);
+    console.log(message);
+    inputElement.value = '';
+    }
+    });
+  
+    // Update messages on page load
+    updateMessages();
+
+
+
+
+
     console.log(myContract);
+    console.log("test attempted");
+    //displayChatHistory();
     const coinbase = await web3.eth.getCoinbase();
     const coinbaseString = coinbase.toString(); //get user address
     let player1 = await myContract.methods.player1().call();
@@ -225,15 +283,17 @@ if (typeof window.ethereum !== 'undefined') {
             console.log("wait message gone")
             document.body.removeChild(waitingMessage2);
           } else {
-            await new Promise(resolve => setTimeout(resolve, 3000)); // wait for 1 second before checking again
+            await new Promise(resolve => setTimeout(resolve, 10000)); // wait for 10 second before checking again
+            /*
             // pull boards from chain to update player structure
             player1Board = await myContract.methods.getPlayer1Board().call();
             player2Board = await myContract.methods.getPlayer2Board().call();
             // read turns from chain
             player1 = await myContract.methods.player1().call();
             player2 = await myContract.methods.player2().call();
+            */
             location.reload();
-            await waitForTurn();
+            //await waitForTurn();
           }
         };
         await waitForTurn();
