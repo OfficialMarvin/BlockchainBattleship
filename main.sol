@@ -151,8 +151,7 @@ function reset() public {
     player2.isTurn = false;
     player1.playerAddress = address(0);
     player2.playerAddress = address(0);
-    chatHistory.length = 0;
-    chatHistory = [];
+    delete chatHistory;
 }
 
 }
