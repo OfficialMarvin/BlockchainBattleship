@@ -105,7 +105,7 @@ console.log(window.ethereum);
 const provider = new Web3.providers.HttpProvider('https://sepolia.infura.io/v3/ef929a0b34fa45c6b8758c57145b96b5');
 let web3;
 let egrid = [];
-const contractAddress = '0xFe121977CcB5114C32343AFDc09Dd13dc2aCC36a';
+const contractAddress = '0x5F1E312f7d22029993fB3081535c3eFbEB2626a1';
 if (typeof window.ethereum !== 'undefined') {
   try {
     await window.ethereum.enable();
